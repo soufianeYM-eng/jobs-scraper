@@ -1,16 +1,11 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { TelegramService } from './telegram.service';
 import { TelegrafModule } from 'nestjs-telegraf';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JobsScraperModule } from './jobs-scraper/jobs-scraper.module';
-import { TelegramModule } from './telegram/telegram.module';
+import { TelegramUpdate } from './telegram.update';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
     TelegrafModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -18,10 +13,7 @@ import { TelegramModule } from './telegram/telegram.module';
         token: configService.get<string>('TELEGRAM_BOT_TOKEN') ?? '',
       }),
     }),
-    JobsScraperModule,
-    TelegramModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  providers: [TelegramService, TelegramUpdate],
 })
-export class AppModule {}
+export class TelegramModule {}
