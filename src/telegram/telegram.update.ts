@@ -7,7 +7,7 @@ import { Context } from 'telegraf';
 export class TelegramUpdate {
 
   @Start()
-  async onStart(@Ctx() ctx: Context) {
-    const chat = await ctx.reply('Welcome! 👋 Your bot V2 is now ready.');
+  onStart(@Ctx() ctx: Context) {
+    ctx.reply('Welcome! 👋 Your bot V2 is now ready.');
   }
 }

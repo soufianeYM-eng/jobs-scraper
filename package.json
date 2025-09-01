@@ -25,8 +25,10 @@
     "@nestjs/core": "^11.0.1",
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^11.0.1",
+    "@prisma/client": "^6.15.0",
     "@telegraf/types": "^9.0.0",
     "nestjs-telegraf": "^2.9.1",
+    "prisma": "^6.15.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "telegraf": "^4.16.3"
