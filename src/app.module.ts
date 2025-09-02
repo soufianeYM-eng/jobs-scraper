@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { JobsScraperModule } from './jobs-scraper/jobs-scraper.module';
 import { TelegramModule } from './telegram/telegram.module';
 import { UserModule } from './user/user.module';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { UserModule } from './user/user.module';
     JobsScraperModule,
     TelegramModule,
     UserModule,
+    PrismaModule,
   ],
   controllers: [AppController],
   providers: [AppService],
