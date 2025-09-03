@@ -21,24 +21,24 @@ enum ChatType {
 }
 
 model User {
-  id        Int        @id @default(autoincrement())
-  username  String     @unique
-  firstName String?    @map("first_name")
-  lastName  String?    @map("last_name")
-  createdAt DateTime   @default(now()) @map("created_at")
-  chats     Chat[]
-  JobAlert  JobAlert[]
+  id         Int        @id @default(autoincrement())
+  username   String     @unique
+  firstName  String?    @map("first_name")
+  lastName   String?    @map("last_name")
+  createdAt  DateTime   @default(now()) @map("created_at")
+  chats      Chat[]
+  jobsAlerts JobAlert[]
 
   @@map("users")
 }
 
 model Chat {
-  id        String    @id
-  type      ChatType  @default(PRIVATE)
-  createdAt DateTime  @map("created_at")
-  user      User      @relation(fields: [userId], references: [id])
+  id        String     @id
+  type      ChatType   @default(PRIVATE)
+  createdAt DateTime   @map("created_at")
+  user      User       @relation(fields: [userId], references: [id])
   userId    Int
-  JobAlert  JobAlert?
+  jobAlert  JobAlert[]
 
   @@map("chat")
 }
@@ -50,7 +50,7 @@ model JobAlert {
   user      User     @relation(fields: [userId], references: [id])
   userId    Int
   chat      Chat     @relation(fields: [chatId], references: [id])
-  chatId    String   @unique
+  chatId    String   
 
   @@map("job_alert")
 }

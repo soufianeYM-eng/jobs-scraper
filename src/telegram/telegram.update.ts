@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ChatType } from '@prisma/client';
 import { InlineKeyboardButton } from '@telegraf/types';
-import { Ctx, On, Start, Update } from 'nestjs-telegraf';
+import { Command, Ctx, On, Start, Update } from 'nestjs-telegraf';
 import { RegisterUserPayload } from 'src/user/interfaces/register-user.type';
 import { UserService } from 'src/user/user.service';
 import { Context } from './interfaces/context.interface';
@@ -47,6 +47,31 @@ export class TelegramUpdate {
     );
   }
 
+  @Command('alerts')
+  async onAlerts(@Ctx() ctx: Context) {
+    const user = await this.userService.fetchUserJobAlerts(
+      ctx.message?.from.username as string,
+    );
+    await ctx.reply(
+      user?.jobsAlerts
+        .map((a) => {
+          const keywords = a.keywords
+            .split(',')
+            .map((k) => `*${this.escapeMarkdownV2(k.trim())}*`)
+            .join(', ');
+
+          const createdAt = this.escapeMarkdownV2(
+            new Date(a.createdAt).toLocaleString(),
+          );
+
+          // Safe separator (no escaping needed)
+          return `🔎 Keywords: ${keywords} ➤ 📅 Creation Date: ${createdAt}`;
+        })
+        .join('\n') || 'No alerts yet',
+      { parse_mode: 'MarkdownV2' },
+    );
+  }
+
   @On('callback_query')
   async onCallback(@Ctx() ctx: Context) {
     const callbackQuery = ctx.callbackQuery;
@@ -60,7 +85,7 @@ export class TelegramUpdate {
 
     if (data === 'alert_yes') {
       // Enter the tech stack scene
-      console.warn(ctx)
+      console.warn(ctx);
       return ctx.scene.enter('techStackScene');
     } else if (data === 'alert_no') {
       await ctx.reply(
@@ -69,5 +94,9 @@ export class TelegramUpdate {
     } else {
       await ctx.reply('Unknown option!');
     }
+  }
+
+  escapeMarkdownV2(text: string) {
+    return text.replace(/([_*\[\]()~`>#+\-=|{}.!])/g, '\\$1');
   }
 }

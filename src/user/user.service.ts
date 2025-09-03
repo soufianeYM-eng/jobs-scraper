@@ -6,6 +6,13 @@ import { RegisterUserPayload } from './interfaces/register-user.type';
 export class UserService {
   constructor(private readonly prismaService: PrismaService) {}
 
+  fetchUserJobAlerts(username: string) {
+    return this.prismaService.user.findFirst({
+      where: { username },
+      include: { jobsAlerts: true },
+    });
+  }
+
   async findUser(username: string) {
     const existingUser = await this.prismaService.user.findUnique({
       where: { username },
@@ -13,7 +20,7 @@ export class UserService {
 
     if (!existingUser) throw new NotFoundException('User not found!');
 
-    return existingUser
+    return existingUser;
   }
 
   async registerUser(userPayload: RegisterUserPayload) {
