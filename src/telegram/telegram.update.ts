@@ -4,7 +4,7 @@ import { InlineKeyboardButton } from '@telegraf/types';
 import { Ctx, On, Start, Update } from 'nestjs-telegraf';
 import { RegisterUserPayload } from 'src/user/interfaces/register-user.type';
 import { UserService } from 'src/user/user.service';
-import { Context } from 'telegraf';
+import { Context } from './interfaces/context.interface';
 
 @Injectable()
 @Update()
@@ -14,6 +14,7 @@ export class TelegramUpdate {
   @Start()
   async onStart(@Ctx() ctx: Context) {
     const { chat, message: { date, from } = {} } = ctx;
+
     const registerUserPayload: RegisterUserPayload = {
       username: from?.username ?? 'Incognito',
       firstName: from?.first_name,
@@ -24,43 +25,49 @@ export class TelegramUpdate {
         createdAt: date ? new Date(date * 1000) : new Date(),
       },
     };
+
     const user = await this.userService.registerUser(registerUserPayload);
-    ctx.reply(
-      `👋 Hi ${user?.firstName ?? ''} ${user?.lastName ?? ''} ! \n Welcome to your Job Daily Bot. How can I help you find your next opportunity?`,
+
+    await ctx.reply(
+      `👋 Hi ${user?.firstName ?? ''} ${user?.lastName ?? ''}!\nWelcome to your Job Daily Bot.`,
     );
 
     const keyboard: InlineKeyboardButton[][] = [
       [
-        { text: 'Daily Job Alerts', callback_data: 'daily_alerts' },
-        { text: 'Monthly Job Alerts', callback_data: 'monthly_alerts' },
+        { text: 'Yes', callback_data: 'alert_yes' },
+        { text: 'No', callback_data: 'alert_no' },
       ],
     ];
 
-    ctx.sendMessage('Can you choose one option', {
-      reply_markup: { inline_keyboard: keyboard },
-    });
+    await ctx.sendMessage(
+      'Do you want me to create a daily job alert for you?',
+      {
+        reply_markup: { inline_keyboard: keyboard },
+      },
+    );
   }
 
   @On('callback_query')
-  async on(@Ctx() ctx: Context) {
+  async onCallback(@Ctx() ctx: Context) {
     const callbackQuery = ctx.callbackQuery;
 
-    // Make sure it is a regular callback query, not a GameQuery
     if (!callbackQuery || !('data' in callbackQuery)) {
-      return ctx.answerCbQuery(); // nothing to do
+      return ctx.answerCbQuery();
     }
 
     const data = callbackQuery.data;
+    await ctx.answerCbQuery();
 
-    if (data === 'daily_alerts') {
-      ctx.answerCbQuery();
-      ctx.reply('You have chosen Daily Job Alerts!');
-    } else if (data === 'monthly_alerts') {
-      ctx.answerCbQuery();
-      ctx.reply('You have chosen Monthly Job Alerts!');
+    if (data === 'alert_yes') {
+      // Enter the tech stack scene
+      console.warn(ctx)
+      return ctx.scene.enter('techStackScene');
+    } else if (data === 'alert_no') {
+      await ctx.reply(
+        'Alright! Anyway, you can create it every time you want!',
+      );
     } else {
-      ctx.answerCbQuery();
-      ctx.reply('Unknown option!');
+      await ctx.reply('Unknown option!');
     }
   }
 }
