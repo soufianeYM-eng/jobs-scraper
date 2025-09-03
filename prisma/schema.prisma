@@ -44,6 +44,7 @@ model Chat {
 }
 
 model JobAlert {
+  id        Int      @id @default(autoincrement())
   keywords  String
   createdAt DateTime @map("created_at")
   user      User     @relation(fields: [userId], references: [id])
@@ -51,6 +52,5 @@ model JobAlert {
   chat      Chat     @relation(fields: [chatId], references: [id])
   chatId    String   @unique
 
-  @@id([userId, chatId])
   @@map("job_alert")
 }
